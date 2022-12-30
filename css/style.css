@@ -1,0 +1,164 @@
+html, body{
+    height: 100%;
+}
+     
+body{
+    margin: 0px;
+    padding: 0px;
+    background: #FFFFFF;
+    font-family: 'FangSong';
+    font-size: 12pt;
+}
+         
+h1, h2, h3{
+    margin: 0;
+    padding: 0;
+    color: #404040;
+}
+     
+p, ol, ul{
+    margin-top: 0;
+}
+ 
+p {
+    line-height: 180%;
+}
+ 
+ol, ul{
+    padding: 0;
+    list-style: none;
+}
+     
+.container{   
+    /* Set width of container to
+        1200px and align center */
+    margin: 0px auto;
+    width: 1200px;
+}
+
+header{
+    overflow: hidden;
+}
+
+#top-header{
+         
+    text-align: center;
+    height: 60px;
+}
+
+#logo{
+    float: left;
+    padding: none;
+    margin: none;
+    height: 60px;
+    width: 30%;
+}
+ 
+#logo img{
+    width: 16%;
+    float: left;
+    padding: 10px 0px;
+}   
+
+#menu{
+    float: right;
+    width: 70%;
+    height: 100%;
+    margin: none;
+}
+     
+#menu ul{
+    text-align: center;
+    float: right;
+    margin: none;
+    background: #367878;
+}
+     
+#menu li{
+    display: inline-block;
+    padding: none;
+    margin: none;
+}
+     
+#menu li a, #menu li span{
+    display: inline-block;
+    padding: 0.5em 1.5em;
+    text-decoration: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    line-height: 60px;
+}
+     
+#menu li a{
+         
+    color: #FFF;
+}
+     
+#menu li:hover a, #menu li span{
+    background: #FFF;
+    color: #367878;
+    border-left: 1px solid #367878;
+    text-decoration: none;
+}
+
+#header-image-menu{
+    top: 10px;
+    position: relative;
+}
+
+
+#header-image-menu img{
+    width: 100%;
+    margin: none;
+    padding: none;
+}
+
+
+#image-text{
+    position: absolute;
+    top: 80%;
+    left: 20%;
+    color: #102424;
+    transform: translate(-30%, -30%);
+    text-align: center;
+}
+
+#welcome
+{    overflow: hidden;
+    width: 1000px;
+    margin: 0px auto;
+}
+         
+#welcome .title{
+    margin-top: 20px;
+    padding: 20px;
+    text-align: center;
+}
+ 
+#welcome p{
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.copyright
+{
+    overflow: hidden;
+    padding: 3em 0em;
+    border-top: 20px solid rgba(255, 255, 255, 0.08);
+    text-align: center;
+    background: #0700DD;
+}
+
+
+.copyright p
+{
+    letter-spacing: 1px;
+    font-size: 0.90em;
+    color: rgba(255, 255, 255);
+}
+
+.copyright a
+{
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.8);
+}
