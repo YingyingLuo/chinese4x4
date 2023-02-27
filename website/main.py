@@ -1,10 +1,14 @@
 from browser import document, bind, html
+from copy import deepcopy
 from random import shuffle
+
 # Note: If you could avoid unnecessary import, your script will save several seconds loading time
 # For example, use `"message".title()` instead of `import string; string.capwords("message")`
 
-initial_cards = "一知半解一心一意一丘之貉一目了然"
-initial_definitions = [
+one_char_cell_w = 1.2
+
+initial_chars = "一知半解一心一意一丘之貉一目了然"
+initial_defs = [
     "A little knowledge is a dangerous thing.",
     "John is a person who always works with undivided attention.",
     "These people are cut from the same cloth.",
@@ -16,56 +20,64 @@ initial_pinyin = [
     "yì qiū zhī hé",
     "yí mù liǎo rán",
 ]
-_characters_selector = "#table td.char"
 
-def set_table(characters):
-    for i, cell in enumerate(document.select(_characters_selector)):
-        cell.text = characters[i]
+# initial default values (a Java convention)
+cell_selector = ""
+chars_per_cell = 0
+chars_list = []
 
-set_table(initial_cards)
+# methods relying on input arguments
 
-def write_pinyin(pinyin_list):
+def toggle_column(col_class_name):
+    for cell in document.select(col_class_name):
+        cell.style.display = "" if cell.style.display == "none" else "none"
+
+def get_list(string, chars_per_elem):
+    l = []
+    for i in range(int(len(string) / chars_per_elem)):
+        l.append(string[i * chars_per_elem:i * chars_per_elem + chars_per_elem])
+    return l
+
+# methods relying on global variables
+
+def set_table():
+    for i, cell in enumerate(document.select(cell_selector)):
+        cell.text = chars_list[i]
+
+def write_pinyin():
     for i, cell in enumerate(document.select("#table td.pinyin")):
-        cell.text = pinyin_list[i]
+        cell.text = initial_pinyin[i]
 
-write_pinyin(initial_pinyin)
-
-def write_definitions(defs_list):
+def write_definitions():
     for i, cell in enumerate(document.select("#table td.def")):
-        cell.text = defs_list[i]
+        cell.text = initial_defs[i]
 
-write_definitions(initial_definitions)
-
-def create_empty_cards(n):
-    for i in range(n):
-        document["cards"].attach(html.SPAN("", id="char{}".format(i), draggable=True))
-
-create_empty_cards(16)
+def create_empty_cards():
+    for i in range(int(len(initial_chars) / chars_per_cell)):   # TODO: consider changing to for i in range(len(get_list(...)))
+        document["cards"].attach(html.SPAN("", id="card{}".format(i), draggable=True))
 
 @bind("#start", "click")
 def start(event):
     document["start"].text = "Restart"
-    
-    for cell in document.select(_characters_selector):
-        if cell.id:
-            cell.text = ""
-    
-    cards_list = list(initial_cards)
-    shuffle(cards_list)
-    for i, c in enumerate(cards_list):
-        document["char" + str(i)].text = c
+
+    for cell in document.select(cell_selector):
+        cell.text = ""
+
+    cards = deepcopy(chars_list)
+    shuffle(cards)
+    for i, c in enumerate(cards):
+        document["card" + str(i)].text = c
 
 @bind("#check", "click")
 def check(event):
     wrong_count = 0
-    for i, cell in enumerate(document.select(_characters_selector)):
-        if initial_cards[i] != cell.text:
+    for i, cell in enumerate(document.select(cell_selector)):
+        if chars_list[i] != cell.text:
             wrong_count = wrong_count + 1
 
     document["result"].text = (
-        str(wrong_count) + " characters are in the wrong place."
+        str(wrong_count) + " item(s) are in the wrong place."
         ) if wrong_count != 0 else "Correct!"
-
 
 def mouseover(event):
     event.target.style.cursor = "pointer"
@@ -73,9 +85,10 @@ def mouseover(event):
 def dragstart(event):
     event.dataTransfer.setData("character", event.target.id)
 
-for card in document.select("#cards span"):
-    card.bind("mouseover", mouseover)
-    card.bind("dragstart", dragstart)
+def make_cards_draggable():
+    for card in document.select("#cards span"):
+        card.bind("mouseover", mouseover)
+        card.bind("dragstart", dragstart)
 
 def dragover(event):
     event.dataTransfer.dropEffect = "move"
@@ -88,6 +101,24 @@ def drop(event):
     character.text = to_replace
     event.preventDefault()
 
-for cell in document.select(_characters_selector):
-    cell.bind("dragover", dragover)
-    cell.bind("drop", drop)
+def make_cells_droppable():
+    for cell in document.select(cell_selector):
+        cell.bind("dragover", dragover)
+        cell.bind("drop", drop)
+
+cell_selector = "#table td.round_1"
+chars_per_cell = 4
+chars_list = get_list(initial_chars, chars_per_cell)
+
+write_pinyin()
+write_definitions()
+
+toggle_column("#table td.char")     # hide all cells
+toggle_column(cell_selector)        # show relevant cells
+for cell in document.select(cell_selector):
+    cell.style.width = str(one_char_cell_w * chars_per_cell) + "em"
+
+set_table()
+create_empty_cards()
+make_cards_draggable()
+make_cells_droppable()
