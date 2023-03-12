@@ -1,8 +1,11 @@
 const readAloud = function(rowNum) {
   rowNum = rowNum.toString();
   let toSay = "";
-  for (let i = 1; i <= 4; i++) {
-    toSay = toSay + document.getElementById(rowNum + i.toString()).textContent;
+  var row = document.getElementById("row_" + rowNum);
+  for (var i = 0, cell; cell = row.cells[i]; i++) {
+    if (cell.className.indexOf("char") !== -1) {
+      toSay = toSay + cell.textContent;
+    }
   }
   let utterance = new SpeechSynthesisUtterance(toSay);
   utterance.lang = "zh-CN";
