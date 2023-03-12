@@ -106,7 +106,7 @@ def make_cells_droppable():
         cell.bind("dragover", dragover)
         cell.bind("drop", drop)
 
-cell_selector = "#table td.round_1"
+cell_selector = "#table td.stage_1"
 chars_per_cell = 4
 chars_list = get_list(initial_chars, chars_per_cell)
 
