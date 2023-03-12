@@ -1,4 +1,4 @@
-const readAloud = function(rowNum) {
+function readAloud(rowNum) {
   rowNum = rowNum.toString();
   let toSay = "";
   var row = document.getElementById("row_" + rowNum);
@@ -12,8 +12,8 @@ const readAloud = function(rowNum) {
   speechSynthesis.speak(utterance);
 };
 
-const toggleColumn = function(col_class_name) {
-  const cells = document.getElementsByClassName(col_class_name);
+function toggleColumn(colClassName) {
+  const cells = document.getElementsByClassName(colClassName);
   for (var cell of cells) {
     if (cell.style.display === "none") {
       cell.style.display = "";
@@ -23,10 +23,10 @@ const toggleColumn = function(col_class_name) {
   }
 };
 
-const toggleColumnWithButton = function(col_class_name, button_id) {
-  toggleColumn(col_class_name);
+function toggleColumnWithButton(colClassName, buttonID) {
+  toggleColumn(colClassName);
 
-  const button = document.getElementById(button_id);
+  const button = document.getElementById(buttonID);
   if (button.textContent.substring(0, 4) === "Hide") {
     button.textContent = "Show" + button.textContent.substring(4);
   } else {
