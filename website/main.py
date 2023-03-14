@@ -50,7 +50,7 @@ def write_definitions():
         cell.text = initial_defs[i]
 
 def create_empty_cards():
-    for i in range(int(len(initial_chars) / chars_per_cell)):   # TODO: consider changing to for i in range(len(get_list(...)))
+    for i in range(int(len(initial_chars) / chars_per_cell)):
         document["cards"].attach(html.SPAN("", id="card{}".format(i), draggable=True))
 
 @bind("#start", "click")
@@ -98,10 +98,28 @@ def drop(event):
     character.text = to_replace
     event.preventDefault()
 
-def make_cells_droppable():
-    for cell in document.select(cell_selector):
+def make_char_cells_droppable():
+    for cell in document.select("#table td.char"):
         cell.bind("dragover", dragover)
         cell.bind("drop", drop)
+
+def set_stage():
+    for cell in document.select("#table td.char"):
+        cell.text = ""
+        cell.style.display = ""
+    toggle_column("#table td.char")     # hide all cells
+    toggle_column(cell_selector)        # show relevant cells
+    for cell in document.select(cell_selector):
+        cell.style.width = str(one_char_cell_w * chars_per_cell) + "em"
+
+    document["start"].text = "Start"
+
+    for card in document.select("#cards span"):
+        card.text = ""
+
+    set_table()
+    create_empty_cards()
+    make_cards_draggable()
 
 cell_selector = "#table td.stage_1"
 chars_per_cell = 4
@@ -109,13 +127,24 @@ chars_list = get_list(initial_chars, chars_per_cell)
 
 write_pinyin()
 write_definitions()
+make_char_cells_droppable()
+set_stage()
 
-toggle_column("#table td.char")     # hide all cells
-toggle_column(cell_selector)        # show relevant cells
-for cell in document.select(cell_selector):
-    cell.style.width = str(one_char_cell_w * chars_per_cell) + "em"
+@bind("#next_stage", "click")
+def next_stage(event):
+    global cell_selector
+    global chars_per_cell
+    global chars_list
 
-set_table()
-create_empty_cards()
-make_cards_draggable()
-make_cells_droppable()
+    if chars_per_cell <= 1:
+        print("Current stage is already the last stage")
+        return
+
+    cell_selector = (
+        cell_selector[:len(cell_selector) - 1]
+        + str(int(cell_selector[len(cell_selector) - 1]) + 1)
+    )
+    chars_per_cell = int(chars_per_cell / 2)
+    chars_list = get_list(initial_chars, chars_per_cell)
+
+    set_stage()
