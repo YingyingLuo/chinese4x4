@@ -33,10 +33,7 @@ def toggle_column(col_class_name):
         cell.style.display = "" if cell.style.display == "none" else "none"
 
 def get_list(string, chars_per_elem):
-    l = []
-    for i in range(int(len(string) / chars_per_elem)):
-        l.append(string[i * chars_per_elem:i * chars_per_elem + chars_per_elem])
-    return l
+    return [string[i:i + chars_per_elem] for i in range(0, len(string), chars_per_elem)]
 
 # methods relying on global variables
 
