@@ -1,11 +1,9 @@
 function readAloud(rowNum) {
   rowNum = rowNum.toString();
   let toSay = "";
-  var row = document.getElementById("row_" + rowNum);
-  for (var i = 0, cell; cell = row.cells[i]; i++) {
-    if (cell.className.indexOf("char") !== -1) {
-      toSay = toSay + cell.textContent;
-    }
+  var cells = document.querySelectorAll("#row_" + rowNum + " td.char");
+  for (var cell of cells) {
+    toSay = toSay + cell.textContent;
   }
   let utterance = new SpeechSynthesisUtterance(toSay);
   utterance.lang = "zh-CN";
