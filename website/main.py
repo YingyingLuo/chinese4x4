@@ -1,11 +1,8 @@
 from browser import document, bind, html
-from copy import deepcopy
 from random import shuffle
 
 # Note: If you could avoid unnecessary import, your script will save several seconds loading time
 # For example, use `"message".title()` instead of `import string; string.capwords("message")`
-
-one_char_cell_w = 1.2
 
 initial_chars = "一知半解一心一意一丘之貉一目了然"
 initial_defs = [
@@ -21,76 +18,36 @@ initial_pinyin = [
     "yí mù liǎo rán",
 ]
 
-# initial default values (a Java convention)
-cell_selector = ""
-chars_per_cell = 0
-chars_list = []
-
-# methods relying on input arguments
-
-def toggle_column(col_class_name):
-    for cell in document.select(col_class_name):
-        cell.style.display = "" if cell.style.display == "none" else "none"
-
 def get_list(string, chars_per_elem):
     return [string[i:i + chars_per_elem] for i in range(0, len(string), chars_per_elem)]
 
-# methods relying on global variables
-
-def set_table():
+def fill(cell_selector, words):
     for i, cell in enumerate(document.select(cell_selector)):
-        cell.text = chars_list[i]
+        cell.text = words[i] if i < len(words) else ""
 
-def write_pinyin():
-    for i, cell in enumerate(document.select("#table td.pinyin")):
-        cell.text = initial_pinyin[i]
+fill("#table td.pinyin", initial_pinyin)
+fill("#table td.def", initial_defs)
+for i in range(16):  # Predefine all cards
+    document["cards"].attach(html.SPAN("", id="card{}".format(i), draggable=True))
 
-def write_definitions():
-    for i, cell in enumerate(document.select("#table td.def")):
-        cell.text = initial_defs[i]
+CARDS = "#cards span"  # Cards are predefined, we can bind events to them once and for all
 
-def create_empty_cards():
-    for i in range(int(len(initial_chars) / chars_per_cell)):
-        document["cards"].attach(html.SPAN("", id="card{}".format(i), draggable=True))
-
-@bind("#start", "click")
-def start(event):
-    document["start"].text = "Restart"
-
-    for cell in document.select(cell_selector):
-        cell.text = ""
-
-    cards = deepcopy(chars_list)
-    shuffle(cards)
-    for i, c in enumerate(cards):
-        document["card" + str(i)].text = c
-
-@bind("#check", "click")
-def check(event):
-    wrong_count = 0
-    for i, cell in enumerate(document.select(cell_selector)):
-        if chars_list[i] != cell.text:
-            wrong_count = wrong_count + 1
-
-    document["result"].text = (
-        str(wrong_count) + " item(s) are in the wrong place."
-        ) if wrong_count != 0 else "Correct!"
-
+@bind(CARDS, "mouseover")
 def mouseover(event):
     event.target.style.cursor = "pointer"
 
+@bind(CARDS, "dragstart")
 def dragstart(event):
     event.dataTransfer.setData("character", event.target.id)
 
-def make_cards_draggable():
-    for card in document.select("#cards span"):
-        card.bind("mouseover", mouseover)
-        card.bind("dragstart", dragstart)
+BOARD = "#table td.char"
 
+@bind(BOARD, "dragover")
 def dragover(event):
     event.dataTransfer.dropEffect = "move"
     event.preventDefault()
 
+@bind(BOARD, "drop")
 def drop(event):
     character = document[event.dataTransfer.getData("character")]
     to_replace = event.target.text
@@ -98,53 +55,58 @@ def drop(event):
     character.text = to_replace
     event.preventDefault()
 
-def make_char_cells_droppable():
-    for cell in document.select("#table td.char"):
-        cell.bind("dragover", dragover)
-        cell.bind("drop", drop)
+def chars_per_cell(stage):
+    return [4, 2, 1][stage - 1]
 
-def set_stage():
-    for cell in document.select("#table td.char"):
+def _set_stage(stage):
+    assert stage in [1, 2, 3], f"We only accept 1 or 2 or 3 but you chose {stage}"
+    one_char_cell_w = 1.2
+    cell_selector = f"#table td.stage_{stage}"
+    for cell in document.select(BOARD):
         cell.text = ""
-        cell.style.display = ""
-    toggle_column("#table td.char")     # hide all cells
-    toggle_column(cell_selector)        # show relevant cells
+        is_cell_of_current_stage = f"stage_{stage}" in cell.Class().split()
+        cell.style.display = "" if is_cell_of_current_stage else "none"
     for cell in document.select(cell_selector):
-        cell.style.width = str(one_char_cell_w * chars_per_cell) + "em"
+        cell.style.width = str(one_char_cell_w * chars_per_cell(stage)) + "em"
+    fill(cell_selector, get_list(initial_chars, chars_per_cell(stage)))  # sets the table
+    fill("#cards span", [""] * 16)  # Clean up all cards
 
-    document["start"].text = "Start"
+_set_stage(1)  # Set stage 1 by default
 
-    for card in document.select("#cards span"):
-        card.text = ""
+# Note: If they are defined inside html, it turns out refresh page won't reset them to disabled.
+document.select_one("button.starter[value='2']").disabled = True
+document.select_one("button.starter[value='3']").disabled = True
+document.select_one("#check").disabled = True
 
-    set_table()
-    create_empty_cards()
-    make_cards_draggable()
+@bind("button.starter", "click")
+def starter(event):
+    stage = int(event.target.value)
+    _set_stage(stage)
+    fill(BOARD, [""] * 16)
+    cards = get_list(initial_chars, chars_per_cell(stage))
+    shuffle(cards)
+    fill(CARDS, cards)
+    document.select_one("#check").disabled = False
+    document["result"].text = "Drag and drop cards on the left into the table, and then check your work"
 
-cell_selector = "#table td.stage_1"
-chars_per_cell = 4
-chars_list = get_list(initial_chars, chars_per_cell)
+@bind("#check", "click")
+def check(event):
+    # Relies on the number of visible board cells to auto-detect the stage
+    visible_cells = document.select(
+        # The selector is inspired from https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors#languages
+        # Seems fragile, though. For example, the space in the selector must be there.
+        BOARD + ':not([style*="display: none"])')
+    expected = get_list(initial_chars, 16 // len(visible_cells))
+    actual = [cell.text for cell in visible_cells]
+    pairs = zip(expected, actual)
+    wrong_count = sum(1 if e != a else 0 for e, a in pairs)
+    if wrong_count:
+        document["result"].text = f"{wrong_count} item(s) are in the wrong place."
+    else:
+        current_stage = {4: 1, 8: 2, 16: 3}[len(visible_cells)]
+        if current_stage < 3:
+            document.select(f'button.starter[value="{current_stage+1}"]')[0].disabled = False
+            document["result"].text = "Correct! Next stage is now unlocked."
+        else:
+            document["result"].text = "Congratulations! You have cleared 3 stages!"
 
-write_pinyin()
-write_definitions()
-make_char_cells_droppable()
-set_stage()
-
-@bind("#next_stage", "click")
-def next_stage(event):
-    global cell_selector
-    global chars_per_cell
-    global chars_list
-
-    if chars_per_cell <= 1:
-        print("Current stage is already the last stage")
-        return
-
-    cell_selector = (
-        cell_selector[:len(cell_selector) - 1]
-        + str(int(cell_selector[len(cell_selector) - 1]) + 1)
-    )
-    chars_per_cell = int(chars_per_cell / 2)
-    chars_list = get_list(initial_chars, chars_per_cell)
-
-    set_stage()

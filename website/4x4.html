@@ -74,17 +74,20 @@
               </tr>
             </tbody>
           </table>
-          <button id="start">Start</button>
+          <button class="starter" value=1>Stage 1</button>
+          <button class="starter" value=2>Stage 2</button>
+          <button class="starter" value=3>Stage 3</button>
           <button id="check">Check</button>
-          <button id="toggle_pinyin" onclick="toggleColumnWithButton('pinyin', 'toggle_pinyin')">Hide pinyin</button>
-          <button id="toggle_defs" onclick="toggleColumnWithButton('def', 'toggle_defs')">Hide definitions</button>
-          <button id="next_stage" style = "float: right;">Next stage</button>
+          <span class="float-end">
+            <button id="toggle_pinyin" onclick="toggleColumnWithButton('pinyin', 'toggle_pinyin')">Hide pinyin</button>
+            <button id="toggle_defs" onclick="toggleColumnWithButton('def', 'toggle_defs')">Hide definitions</button>
+          </span>
           <p id="result"></p>
           <a href="index.html">Back to Home Page</a>
         </div>
       </div>
     </div>
-    
+
     <!--
       Your main logic could go into a dedicated .py file,
       so that the line number in error trace would correctly map into your .py file.
