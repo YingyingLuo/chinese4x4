@@ -28,7 +28,12 @@ def fill(cell_selector, words):
 fill("#table td.pinyin", initial_pinyin)
 fill("#table td.def", initial_defs)
 for i in range(16):  # Predefine all cards
-    document["cards"].attach(html.SPAN("", id="card{}".format(i), draggable=True))
+    document["cards"].attach(html.SPAN(
+        "",
+        id="card{}".format(i),
+        draggable=True,
+        Class="shadow",
+        ))
 
 CARDS = "#cards span"  # Cards are predefined, we can bind events to them once and for all
 
@@ -38,7 +43,7 @@ def mouseover(event):
 
 @bind(CARDS, "dragstart")
 def dragstart(event):
-    event.dataTransfer.setData("character", event.target.id)
+    event.dataTransfer.setData("dragged", event.target.id)  # data has to be a string
 
 BOARD = "#table td.char"
 
@@ -49,10 +54,17 @@ def dragover(event):
 
 @bind(BOARD, "drop")
 def drop(event):
-    character = document[event.dataTransfer.getData("character")]
-    to_replace = event.target.text
-    event.target.text = character.text
-    character.text = to_replace
+    character = document[event.dataTransfer.getData("dragged")]
+    print(event.target)
+    if isinstance(event.target, html.SPAN):  # Turns out sub-SPAN is also droppable
+        event.target.text, character.text = character.text, event.target.text
+    elif isinstance(event.target, html.TD):
+        target_cards = event.target.select("span")
+        if target_cards:
+            target_cards[0].text, character.text = character.text, target_cards[0].text
+        else:
+            event.target.attach(html.SPAN(character.text, Class="shadow"))
+            character.text = ""
     event.preventDefault()
 
 def chars_per_cell(stage):
