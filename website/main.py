@@ -55,7 +55,6 @@ def dragover(event):
 @bind(BOARD, "drop")
 def drop(event):
     character = document[event.dataTransfer.getData("dragged")]
-    print(event.target)
     if isinstance(event.target, html.SPAN):  # Turns out sub-SPAN is also droppable
         event.target.text, character.text = character.text, event.target.text
     elif isinstance(event.target, html.TD):
@@ -101,6 +100,16 @@ def starter(event):
     document.select_one("#check").disabled = False
     document["result"].text = "Drag and drop cards on the left into the table, and then check your work"
 
+
+@bind("#stage_4_button", "click")
+def stage_4(event):
+    @bind(".char", "click")
+    def toggle(event):
+        if event.target.style.color == "white":
+            event.target.style.color = "black"
+        else:
+            event.target.style.color = "white"
+
 @bind("#check", "click")
 def check(event):
     # Relies on the number of visible board cells to auto-detect the stage
@@ -121,4 +130,3 @@ def check(event):
             document["result"].text = "Correct! Next stage is now unlocked."
         else:
             document["result"].text = "Congratulations! You have cleared 3 stages!"
-
