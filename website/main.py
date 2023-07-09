@@ -87,6 +87,7 @@ _set_stage(1)  # Set stage 1 by default
 # Note: If they are defined inside html, it turns out refresh page won't reset them to disabled.
 document.select_one("button.starter[value='2']").disabled = True
 document.select_one("button.starter[value='3']").disabled = True
+document.select_one("#stage_4_button").disabled = True
 document.select_one("#check").disabled = True
 
 @bind("button.starter", "click")
@@ -125,8 +126,8 @@ def check(event):
         document["result"].text = f"{wrong_count} item(s) are in the wrong place."
     else:
         current_stage = {4: 1, 8: 2, 16: 3}[len(visible_cells)]
+        document["result"].text = "Correct! Next stage is now unlocked."
         if current_stage < 3:
             document.select(f'button.starter[value="{current_stage+1}"]')[0].disabled = False
-            document["result"].text = "Correct! Next stage is now unlocked."
         else:
-            document["result"].text = "Congratulations! You have cleared 3 stages!"
+            document.select_one("#stage_4_button").disabled = False
