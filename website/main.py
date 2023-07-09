@@ -1,22 +1,23 @@
-from browser import document, bind, html, window
+from browser import document, bind, html, window, ajax
 from random import shuffle
+import csv
 
-# Note: If you could avoid unnecessary import, your script will save several seconds loading time
-# For example, use `"message".title()` instead of `import string; string.capwords("message")`
 
-initial_chars = "一知半解一心一意一丘之貉一目了然"
-initial_defs = [
-    "A little knowledge is a dangerous thing.",
-    "John is a person who always works with undivided attention.",
-    "These people are cut from the same cloth.",
-    "His words just leapt to the eye.",
-]
-initial_pinyin = [
-    "yì zhī bàn jiě",
-    "yì xīn yí yì",
-    "yì qiū zhī hé",
-    "yí mù liǎo rán",
-]
+initial_chars = "一知半解一心一意一丘之貉一目了然"  # Placeholder
+
+# Read idioms from query string idioms=path/to/file.csv
+def initialize(ajax_response):
+    global initial_chars
+    print(ajax_response.text)
+    idioms = {}
+    for row in csv.reader(ajax_response.text.splitlines()):
+        idioms[row[0]] = (row[1], row[2])
+    initial_chars = "".join(idioms.keys())
+    fill("#table td.pinyin", [v[0] for v in idioms.values()])
+    fill("#table td.def", [v[1] for v in idioms.values()])
+    _set_stage(1)  # Set stage 1 by default
+ajax.get(document.query.getvalue("idioms", "idioms/default.csv"), oncomplete=initialize)
+
 
 def get_list(string, chars_per_elem):
     return [string[i:i + chars_per_elem] for i in range(0, len(string), chars_per_elem)]
@@ -25,8 +26,6 @@ def fill(cell_selector, words):
     for i, cell in enumerate(document.select(cell_selector)):
         cell.text = words[i] if i < len(words) else ""
 
-fill("#table td.pinyin", initial_pinyin)
-fill("#table td.def", initial_defs)
 for i in range(16):  # Predefine all cards
     document["cards"].attach(html.SPAN(
         "",
@@ -82,7 +81,6 @@ def _set_stage(stage):
     fill(cell_selector, get_list(initial_chars, chars_per_cell(stage)))  # sets the table
     fill("#cards span", [""] * 16)  # Clean up all cards
 
-_set_stage(1)  # Set stage 1 by default
 
 # Note: If they are defined inside html, it turns out refresh page won't reset them to disabled.
 document.select_one("button.starter[value='2']").disabled = True
