@@ -1,4 +1,4 @@
-from browser import document, bind, html
+from browser import document, bind, html, window
 from random import shuffle
 
 # Note: If you could avoid unnecessary import, your script will save several seconds loading time
@@ -104,12 +104,24 @@ def starter(event):
 
 @bind("#stage_4_button", "click")
 def stage_4(event):
-    @bind(".char", "click")
-    def toggle(event):
-        if event.target.style.color == "white":
-            event.target.style.color = "black"
-        else:
-            event.target.style.color = "white"
+    _set_stage(3)  # The stage 4 board has same 4x4 setup as stage 3
+    for cell in document.select("#table td.stage_3"):
+        text = cell.text
+        cell.text = ""  # It would also clean up its child
+        cell.attach(html.SPAN(text, Class=" ".join([
+            "shadow",  # For shadow effect
+            "char",  # So that the speaker button can still work
+            "flip",  # For the flip effect
+            ])))
+
+    @bind(".flip", "click")
+    def flip(event):
+        event.target.style.color = "white" if event.target.style.color != "white" else "black"
+
+    @bind(".flip", "dblclick")
+    def speak(event):
+        window.speak(event.target.text)  # Calling a function defined in Javascript
+        # Known issue: After double-click, the text would be selected therefore visible
 
 @bind("#check", "click")
 def check(event):
@@ -131,3 +143,4 @@ def check(event):
             document.select(f'button.starter[value="{current_stage+1}"]')[0].disabled = False
         else:
             document.select_one("#stage_4_button").disabled = False
+
