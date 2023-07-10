@@ -15,7 +15,7 @@
     .shadow {
       box-shadow: 15px 15px 5px black; /* offset-x | offset-y | blur-radius | color */
     }
-    #cards, td.char {
+    #cards, #stage_5_box, td.char {
       font-size: 6vw;
     }
     td.def, td.pinyin {
@@ -35,6 +35,7 @@
         <div class="col-4">
           <h2>Unused characters:</h2>
           <div id="cards"></div>
+          <span id="stage_5_box" class="shadow"></span>
         </div>
         <div class="col-8">
           <table class="table table-bordered" id="table">
@@ -81,6 +82,7 @@
           <button class="starter" value=2>Stage 2</button>
           <button class="starter" value=3>Stage 3</button>
           <button id="stage_4_button">Stage 4</button>
+          <button id="stage_5_button">Stage 5</button>
           <button id="check">Check</button>
           <span class="float-end">
             <button id="toggle_pinyin" onclick="toggleColumnWithButton('pinyin', 'toggle_pinyin')">Hide pinyin</button>

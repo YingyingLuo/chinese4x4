@@ -79,20 +79,21 @@ def _set_stage(stage):
     for cell in document.select(cell_selector):
         cell.style.width = str(one_char_cell_w * chars_per_cell(stage)) + "em"
     fill(cell_selector, get_list(initial_chars, chars_per_cell(stage)))  # sets the table
-    fill("#cards span", [""] * 16)  # Clean up all cards
+    fill(CARDS, [""] * 16)  # Clean up all cards
 
 
 # Note: If they are defined inside html, it turns out refresh page won't reset them to disabled.
 document.select_one("button.starter[value='2']").disabled = True
 document.select_one("button.starter[value='3']").disabled = True
 document.select_one("#stage_4_button").disabled = True
+document.select_one("#stage_5_button").disabled = True
 document.select_one("#check").disabled = True
 
 @bind("button.starter", "click")
 def starter(event):
     stage = int(event.target.value)
     _set_stage(stage)
-    fill(BOARD, [""] * 16)
+    clean_up()
     cards = get_list(initial_chars, chars_per_cell(stage))
     shuffle(cards)
     fill(CARDS, cards)
@@ -141,4 +142,26 @@ def check(event):
             document.select(f'button.starter[value="{current_stage+1}"]')[0].disabled = False
         else:
             document.select_one("#stage_4_button").disabled = False
+            document.select_one("#stage_5_button").disabled = False
+
+@bind("#stage_5_button", "click")
+def stage_5(event):
+    clean_up()
+    cards = get_list(initial_chars, 1)
+    shuffle(cards)
+    document["stage_5_box"].text = cards[0]
+
+    @bind(document["stage_5_box"], "click")
+    def get_next(event):
+        if cards:
+            document["stage_5_box"].text = cards.pop(0)
+        else:
+            document["stage_5_box"].text = ""
+            document["result"].text = "Congrats! You have completed all stages."
+
+def clean_up():
+    # A unified helper so that old callers will also clean up residue from newly added stages
+    fill(CARDS, [""] * len(initial_chars))  # Stage 1, 2, 3
+    fill(BOARD, [""] * len(initial_chars))  # All stages
+    document["stage_5_box"].text = ""  # For stage 5
 
