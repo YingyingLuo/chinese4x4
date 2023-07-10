@@ -1,4 +1,4 @@
-from browser import document, bind, html
+from browser import document, bind, html, window
 from random import shuffle
 
 # Note: If you could avoid unnecessary import, your script will save several seconds loading time
@@ -55,7 +55,6 @@ def dragover(event):
 @bind(BOARD, "drop")
 def drop(event):
     character = document[event.dataTransfer.getData("dragged")]
-    print(event.target)
     if isinstance(event.target, html.SPAN):  # Turns out sub-SPAN is also droppable
         event.target.text, character.text = character.text, event.target.text
     elif isinstance(event.target, html.TD):
@@ -88,6 +87,7 @@ _set_stage(1)  # Set stage 1 by default
 # Note: If they are defined inside html, it turns out refresh page won't reset them to disabled.
 document.select_one("button.starter[value='2']").disabled = True
 document.select_one("button.starter[value='3']").disabled = True
+document.select_one("#stage_4_button").disabled = True
 document.select_one("#check").disabled = True
 
 @bind("button.starter", "click")
@@ -100,6 +100,28 @@ def starter(event):
     fill(CARDS, cards)
     document.select_one("#check").disabled = False
     document["result"].text = "Drag and drop cards on the left into the table, and then check your work"
+
+
+@bind("#stage_4_button", "click")
+def stage_4(event):
+    _set_stage(3)  # The stage 4 board has same 4x4 setup as stage 3
+    for cell in document.select("#table td.stage_3"):
+        text = cell.text
+        cell.text = ""  # It would also clean up its child
+        cell.attach(html.SPAN(text, Class=" ".join([
+            "shadow",  # For shadow effect
+            "char",  # So that the speaker button can still work
+            "flip",  # For the flip effect
+            ])))
+
+    @bind(".flip", "click")
+    def flip(event):
+        event.target.style.color = "white" if event.target.style.color != "white" else "black"
+
+    @bind(".flip", "dblclick")
+    def speak(event):
+        window.speak(event.target.text)  # Calling a function defined in Javascript
+        # Known issue: After double-click, the text would be selected therefore visible
 
 @bind("#check", "click")
 def check(event):
@@ -116,9 +138,9 @@ def check(event):
         document["result"].text = f"{wrong_count} item(s) are in the wrong place."
     else:
         current_stage = {4: 1, 8: 2, 16: 3}[len(visible_cells)]
+        document["result"].text = "Correct! Next stage is now unlocked."
         if current_stage < 3:
             document.select(f'button.starter[value="{current_stage+1}"]')[0].disabled = False
-            document["result"].text = "Correct! Next stage is now unlocked."
         else:
-            document["result"].text = "Congratulations! You have cleared 3 stages!"
+            document.select_one("#stage_4_button").disabled = False
 

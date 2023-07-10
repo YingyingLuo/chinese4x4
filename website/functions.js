@@ -5,10 +5,14 @@ function readAloud(rowNum) {
   for (var cell of cells) {
     toSay = toSay + cell.textContent;
   }
-  let utterance = new SpeechSynthesisUtterance(toSay);
+  speak(toSay);
+}
+
+function speak(speech) {
+  let utterance = new SpeechSynthesisUtterance(speech);
   utterance.lang = "zh-CN";
   speechSynthesis.speak(utterance);
-};
+}
 
 function toggleColumn(colClassName) {
   const cells = document.getElementsByClassName(colClassName);
@@ -19,7 +23,7 @@ function toggleColumn(colClassName) {
       cell.style.display = "none";
     }
   }
-};
+}
 
 function toggleColumnWithButton(colClassName, buttonID) {
   toggleColumn(colClassName);
@@ -30,4 +34,5 @@ function toggleColumnWithButton(colClassName, buttonID) {
   } else {
     button.textContent = "Hide" + button.textContent.substring(4);
   }
-};
+}
+
