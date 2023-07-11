@@ -70,14 +70,11 @@ def chars_per_cell(stage):
 
 def _set_stage(stage):
     assert stage in [1, 2, 3], f"We only accept 1 or 2 or 3 but you chose {stage}"
-    one_char_cell_w = 1.2
     cell_selector = f"#table td.stage_{stage}"
     for cell in document.select(BOARD):
         cell.text = ""
         is_cell_of_current_stage = f"stage_{stage}" in cell.Class().split()
         cell.style.display = "" if is_cell_of_current_stage else "none"
-    for cell in document.select(cell_selector):
-        cell.style.width = str(one_char_cell_w * chars_per_cell(stage)) + "em"
     fill(cell_selector, get_list(initial_chars, chars_per_cell(stage)))  # sets the table
     fill(CARDS, [""] * 16)  # Clean up all cards
 
