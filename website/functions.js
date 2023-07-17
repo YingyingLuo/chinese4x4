@@ -9,6 +9,15 @@ function readAloud(rowNum) {
 }
 
 function speak(speech) {
+  var voices = window.speechSynthesis.getVoices();
+  var neededVoices = voices.find(voice => voice.lang.startsWith("zh-CN"));
+  if(neededVoices === undefined) {
+    console.log(voices);
+    // Firefox is known to support only English languages on Windows, https://stackoverflow.com/questions/43983845/speechsynthesis-api-for-chinese-firefox
+    // as demonstrated here https://mdn.github.io/dom-examples/web-speech-api/speak-easy-synthesis/
+    alert("Your browser does not speak Chinese. Please switch to Chrome, Edge or Safari.");
+  }
+
   let utterance = new SpeechSynthesisUtterance(speech);
   utterance.lang = "zh-CN";
   speechSynthesis.speak(utterance);
