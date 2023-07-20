@@ -43,6 +43,7 @@ def mouseover(event):
 @bind(CARDS, "dragstart")
 def dragstart(event):
     event.dataTransfer.setData("dragged", event.target.id)  # data has to be a string
+    print(event.target)#test
 
 BOARD = "#table td.char"
 
@@ -64,6 +65,16 @@ def drop(event):
             event.target.attach(html.SPAN(character.text, Class="shadow"))
             character.text = ""
     event.preventDefault()
+    print(event.target)#test
+
+    # test
+    @bind("#table span", "mouseover")
+    def mouseover(event):
+        event.target.style.cursor = "pointer"
+    #test
+    @bind("#table span", "dragstart")
+    def dragstart(event):
+        event.dataTransfer.setData("dragged", event.target.id)  # data has to be a string
 
 def chars_per_cell(stage):
     return [4, 2, 1][stage - 1]
