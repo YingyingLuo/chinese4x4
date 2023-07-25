@@ -1,7 +1,7 @@
 from browser import document, bind, html, window, ajax
 from random import shuffle
 import csv
-
+from dragdrop import Card
 
 initial_chars = "一知半解一心一意一丘之貉一目了然"  # Placeholder
 
@@ -27,22 +27,9 @@ def fill(cell_selector, words):
         cell.text = words[i] if i < len(words) else ""
 
 for i in range(16):  # Predefine all cards
-    document["cards"].attach(html.SPAN(
-        "",
-        id="card{}".format(i),
-        draggable=True,
-        Class="shadow",
-        ))
+    document["cards"].attach(Card("", Class="shadow"))
 
 CARDS = "#cards span"  # Cards are predefined, we can bind events to them once and for all
-
-@bind(CARDS, "mouseover")
-def mouseover(event):
-    event.target.style.cursor = "pointer"
-
-@bind(CARDS, "dragstart")
-def dragstart(event):
-    event.dataTransfer.setData("dragged", event.target.id)  # data has to be a string
 
 BOARD = "#table td.char"
 
@@ -61,7 +48,7 @@ def drop(event):
         if target_cards:
             target_cards[0].text, character.text = character.text, target_cards[0].text
         else:
-            event.target.attach(html.SPAN(character.text, Class="shadow"))
+            event.target.attach(Card(character.text, Class="shadow"))
             character.text = ""
     event.preventDefault()
 
