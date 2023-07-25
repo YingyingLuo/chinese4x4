@@ -27,23 +27,9 @@ def fill(cell_selector, words):
         cell.text = words[i] if i < len(words) else ""
 
 for i in range(16):  # Predefine all cards
-    document["cards"].attach(html.SPAN(
-        "",
-        id="card{}".format(i),
-        draggable=True,
-        Class="shadow",
-        ))
+    document["cards"].attach(Card("", Class="shadow"))
 
 CARDS = "#cards span"  # Cards are predefined, we can bind events to them once and for all
-
-@bind(CARDS, "mouseover")
-def mouseover(event):
-    event.target.style.cursor = "pointer"
-
-@bind(CARDS, "dragstart")
-def dragstart(event):
-    event.dataTransfer.setData("dragged", event.target.id)  # data has to be a string
-    print(event.target)#test
 
 BOARD = "#table td.char"
 
@@ -62,18 +48,9 @@ def drop(event):
         if target_cards:
             target_cards[0].text, character.text = character.text, target_cards[0].text
         else:
-            event.target.attach(Card(character.text))
+            event.target.attach(Card(character.text, Class="shadow"))
             character.text = ""
     event.preventDefault()
-
-    # test
-    @bind("#table span", "mouseover")
-    def mouseover(event):
-        event.target.style.cursor = "pointer"
-    #test
-    @bind("#table span", "dragstart")
-    def dragstart(event):
-        event.dataTransfer.setData("dragged", event.target.id)  # data has to be a string
 
 def chars_per_cell(stage):
     return [4, 2, 1][stage - 1]
