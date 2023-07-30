@@ -69,9 +69,9 @@ def _set_stage(stage):
 # Note: If they are defined inside html, it turns out refresh page won't reset them to disabled.
 document.select_one("button.starter[value='2']").disabled = True
 document.select_one("button.starter[value='3']").disabled = True
-document.select_one("#stage_4_button").disabled = True
-document.select_one("#stage_5_button").disabled = True
-document.select_one("#check").disabled = True
+document["stage_4_button"].disabled = True
+document["stage_5_button"].disabled = True
+document["check"].disabled = True
 
 @bind("button.starter", "click")
 def starter(event):
@@ -81,13 +81,13 @@ def starter(event):
     cards = get_list(initial_chars, chars_per_cell(stage))
     shuffle(cards)
     fill(CARDS, cards)
-    document.select_one("#check").disabled = False
+    document["check"].disabled = False
     document["result"].text = "Drag and drop cards on the left into the table, and then check your work"
 
 
 @bind("#stage_4_button", "click")
 def stage_4(event):
-    document.select_one("#check").disabled = True
+    document["check"].disabled = True
     _set_stage(3)  # The stage 4 board has same 4x4 setup as stage 3
     for cell in document.select("#table td.stage_3"):
         text = cell.text
@@ -126,12 +126,12 @@ def check(event):
         if current_stage < 3:
             document.select(f'button.starter[value="{current_stage+1}"]')[0].disabled = False
         else:
-            document.select_one("#stage_4_button").disabled = False
-            document.select_one("#stage_5_button").disabled = False
+            document["stage_4_button"].disabled = False
+            document["stage_5_button"].disabled = False
 
 @bind("#stage_5_button", "click")
 def stage_5(event):
-    document.select_one("#check").disabled = True
+    document["check"].disabled = True
     clean_up()
     cards = get_list(initial_chars, 1)
     shuffle(cards)
