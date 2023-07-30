@@ -1,6 +1,6 @@
 # Chinese Learning Project
 
-All descriptions below apply for Simplified Chinese only.
+This project currently supports Simplified Chinese only.
 
 ## 4x4 Chinese Learning Technique
 
