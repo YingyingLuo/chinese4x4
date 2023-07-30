@@ -117,9 +117,9 @@ def check(event):
     expected = get_list(initial_chars, 16 // len(visible_cells))
     actual = [cell.text for cell in visible_cells]
     pairs = zip(expected, actual)
-    wrong_count = sum(1 if e != a else 0 for e, a in pairs)
-    if wrong_count:
-        document["result"].text = f"Not quite! {len(actual) - wrong_count} item(s) are in the right place so far."
+    right_count = sum(1 if e == a else 0 for e, a in pairs)
+    if right_count < len(actual):
+        document["result"].text = f"Not quite! {right_count} item(s) are in the right place so far."
     else:
         current_stage = {4: 1, 8: 2, 16: 3}[len(visible_cells)]
         document["result"].text = "All correct! Next stage is now unlocked."
@@ -150,4 +150,3 @@ def clean_up():
     fill(CARDS, [""] * len(initial_chars))  # Stage 1, 2, 3
     fill(BOARD, [""] * len(initial_chars))  # All stages
     document["stage_5_box"].text = ""  # For stage 5
-
