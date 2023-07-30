@@ -69,7 +69,7 @@ def _set_stage(stage):
 # Note: If they are defined inside html, it turns out refresh page won't reset them to disabled.
 document.select_one("button.starter[value='2']").disabled = True
 document.select_one("button.starter[value='3']").disabled = True
-document.select_one("#stage_4_button").disabled = True
+document.select_one("#stage_4_button").disabled = False # TODO: change back to True
 document.select_one("#stage_5_button").disabled = True
 document.select_one("#check").disabled = True
 
@@ -91,15 +91,13 @@ def stage_4(event):
     for cell in document.select("#table td.stage_3"):
         text = cell.text
         cell.text = ""  # It would also clean up its child
-        cell.attach(html.SPAN(text, Class=" ".join([
-            "shadow",  # For shadow effect
-            "char",  # So that the speaker button can still work
-            "flip",  # For the flip effect
-            ])))
+        cell.attach(Card(text, Class="shadow flip"))
 
     @bind(".flip", "click")
     def flip(event):
         event.target.style.color = "white" if event.target.style.color != "white" else "black"
+        event.target.times_flipped = event.target.times_flipped + 1
+        print(event.target.times_flipped) #TODO: test
 
     @bind(".flip", "dblclick")
     def speak(event):
