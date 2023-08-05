@@ -65,14 +65,6 @@ def _set_stage(stage):
     fill(cell_selector, get_list(initial_chars, chars_per_cell(stage)))  # sets the table
     fill(CARDS, [""] * 16)  # Clean up all cards
 
-
-# Note: If they are defined inside html, it turns out refresh page won't reset them to disabled.
-document.select_one("button.starter[value='2']").disabled = True
-document.select_one("button.starter[value='3']").disabled = True
-document.select_one("#stage_4_button").disabled = True
-document.select_one("#stage_5_button").disabled = True
-document.select_one("#check").disabled = True
-
 @bind("button.starter", "click")
 def starter(event):
     stage = int(event.target.value)
@@ -149,3 +141,10 @@ def clean_up():
     fill(BOARD, [""] * len(initial_chars))  # All stages
     document["stage_5_box"].text = ""  # For stage 5
 
+# Note: If they are defined inside html, it turns out refresh page won't reset them to disabled.
+document.select_one("button.starter[value='1']").disabled = document.query.getvalue("mode") == "review"
+document.select_one("button.starter[value='2']").disabled = True
+document.select_one("button.starter[value='3']").disabled = document.query.getvalue("mode") != "review"
+document.select_one("#stage_4_button").disabled = True
+document.select_one("#stage_5_button").disabled = True
+document.select_one("#check").disabled = True
