@@ -136,13 +136,17 @@ header{
 }
  
 #welcome p{
-    margin-bottom: 40px;
-    text-align: center;
+    margin: 40px;
 }
 
 #test_character p{
     text-align: center;
     font-size: 300px;
+}
+
+#lessons{
+    text-align: center;
+    font-size: 3em;
 }
 
 .copyright
@@ -153,7 +157,6 @@ header{
     text-align: center;
     background: #0700DD;
 }
-
 
 .copyright p
 {
