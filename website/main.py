@@ -73,12 +73,13 @@ def starter(event):
     cards = get_list(initial_chars, chars_per_cell(stage))
     shuffle(cards)
     fill(CARDS, cards)
-    document.select_one("#check").disabled = False
+    document["check"].disabled = False
     document["result"].text = "Drag and drop cards on the left into the table, and then check your work"
 
 
 @bind("#stage_4_button", "click")
 def stage_4(event):
+    document["check"].disabled = True
     _set_stage(3)  # The stage 4 board has same 4x4 setup as stage 3
     for cell in document.select("#table td.stage_3"):
         text = cell.text
@@ -108,20 +109,21 @@ def check(event):
     expected = get_list(initial_chars, 16 // len(visible_cells))
     actual = [cell.text for cell in visible_cells]
     pairs = zip(expected, actual)
-    wrong_count = sum(1 if e != a else 0 for e, a in pairs)
-    if wrong_count:
-        document["result"].text = f"{wrong_count} item(s) are in the wrong place."
+    right_count = sum(1 if e == a else 0 for e, a in pairs)
+    if right_count < len(actual):
+        document["result"].text = f"Not quite! {right_count} item(s) are in the right place so far."
     else:
         current_stage = {4: 1, 8: 2, 16: 3}[len(visible_cells)]
-        document["result"].text = "Correct! Next stage is now unlocked."
+        document["result"].text = "All correct! Next stage is now unlocked."
         if current_stage < 3:
             document.select(f'button.starter[value="{current_stage+1}"]')[0].disabled = False
         else:
-            document.select_one("#stage_4_button").disabled = False
-            document.select_one("#stage_5_button").disabled = False
+            document["stage_4_button"].disabled = False
+            document["stage_5_button"].disabled = False
 
 @bind("#stage_5_button", "click")
 def stage_5(event):
+    document["check"].disabled = True
     clean_up()
     cards = get_list(initial_chars, 1)
     shuffle(cards)
