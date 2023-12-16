@@ -1,9 +1,24 @@
 from browser import document, bind, html, window, ajax
 from random import shuffle
 import csv
-from dragdrop import Card
+import brython_dragdrop as dragdrop
+
+
+class Card(dragdrop.DraggableMixin, html.SPAN):
+    pass
+
 
 initial_chars = "一知半解一心一意一丘之貉一目了然"  # Placeholder
+BOARD = "#table td.char"
+# Make the dragged elements droppable, based on rules
+dragdrop.make_droppable(BOARD, rules={
+    (Card, Card): dragdrop.swap,
+    (Card, html.TD): dragdrop.occupy,
+})
+dragdrop.make_droppable("#cards", rules={
+    (Card, Card): dragdrop.swap,
+    (Card, html.DIV): dragdrop.join,
+})
 
 # Read idioms from query string idioms=path/to/file.csv
 def initialize(ajax_response):
@@ -27,30 +42,13 @@ def fill(cell_selector, words):
         cell.text = words[i] if i < len(words) else ""
 
 for i in range(16):  # Predefine all cards
-    document["cards"].attach(Card("", Class="shadow"))
+    document["cards"].attach(Card(
+        "",
+        id="card{}".format(i),
+        Class="shadow",
+        ))
 
 CARDS = "#cards span"  # Cards are predefined, we can bind events to them once and for all
-
-BOARD = "#table td.char"
-
-@bind(BOARD, "dragover")
-def dragover(event):
-    event.dataTransfer.dropEffect = "move"
-    event.preventDefault()
-
-@bind(BOARD, "drop")
-def drop(event):
-    character = document[event.dataTransfer.getData("dragged")]
-    if isinstance(event.target, html.SPAN):  # Turns out sub-SPAN is also droppable
-        event.target.text, character.text = character.text, event.target.text
-    elif isinstance(event.target, html.TD):
-        target_cards = event.target.select("span")
-        if target_cards:
-            target_cards[0].text, character.text = character.text, target_cards[0].text
-        else:
-            event.target.attach(Card(character.text, Class="shadow"))
-            character.text = ""
-    event.preventDefault()
 
 def chars_per_cell(stage):
     return [4, 2, 1][stage - 1]
